@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<!-- <suite name="Suite" parallel = "tests" thread-count="2"> -->
+<!-- <suite name="Suite" parallel = "methods" thread-count="2"> parallel 
+	= "classes" <listeners> <listener class-name="com.wsccui.template.BaseListenerWsccui" 
+	/> </listeners> -->
+
+<suite name="Data store Web service. Remote Tom Cat. CRUD. QA" parallel="tests"
+	thread-count="2" data-provider-thread-count="2">
+	<parameter name="env" value="QA" />
+
+	<test name="BAT">
+		<parameter name="uri"
+			value="http://192.168.204.166:6062/ds/rest/order/qa/bat/" />
+		<parameter name="suite" value="bat" />
+		<classes>
+			<class name="com.wsi.ws.test.integ.CrudTest">
+			</class>
+		</classes>
+	</test>
+
+	<test name="Smoke">
+		<parameter name="uri"
+			value="http://192.168.204.166:6062/ds/rest/order/qa/smoke/" />
+		<parameter name="suite" value="smoke" />
+		<classes>
+			<class name="com.wsi.ws.test.integ.CrudTest">
+			</class>
+		</classes>
+	</test>
+
+	<test name="Regression">
+		<parameter name="uri"
+			value="http://192.168.204.166:6062/ds/rest/order/qa/reg/" />
+		<parameter name="suite" value="reg" />
+		<classes>
+			<class name="com.wsi.ws.test.integ.CrudTest">
+			</class>
+		</classes>
+	</test>
+
+	<test name="Others">
+		<parameter name="uri"
+			value="http://192.168.204.166:6062/ds/rest/order/qa/others/" />
+		<parameter name="suite" value="others" />
+		<classes>
+			<class name="com.wsi.ws.test.integ.CrudTest">
+			</class>
+		</classes>
+	</test>
+</suite>

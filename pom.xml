@@ -1,0 +1,394 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>core</groupId>
+	<artifactId>com.rest-api-demo.qa</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jdk.version>1.8</jdk.version>
+		<maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
+
+		<pmd.plugin.version>3.10.0</pmd.plugin.version>
+		<checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
+		<spotbugs.plugin.version>3.1.5</spotbugs.plugin.version>
+
+		<mvn.compiler.plugin>3.6.1</mvn.compiler.plugin>
+		<war.plugin.version>2.6</war.plugin.version>
+		<jackson.version>2.9.0</jackson.version>
+
+		<aspectj.version>1.8.13</aspectj.version>
+		<ng.suite>testng/${tNG}.xml</ng.suite>
+		<!-- <testSourceDirectory>src/test/java/</testSourceDirectory> -->
+
+		<allure.testng.version>2.12.1</allure.testng.version>
+		<allure.maven.version>2.10.0</allure.maven.version>
+
+		<jacoco.version>0.8.4</jacoco.version>
+		<skip.integration.tests>true</skip.integration.tests>
+		<skip.unit.tests>true</skip.unit.tests>
+		<jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
+		<jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+		<draft.package>draft</draft.package>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+
+		<!-- ********************************************* -->
+
+		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>4.1.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-path</artifactId>
+			<version>4.1.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>xml-path</artifactId>
+			<version>4.1.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.qameta.allure/allure-testng -->
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-testng</artifactId>
+			<version>${allure.testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sparkjava</groupId>
+			<artifactId>spark-core</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<plugins>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+
+				<configuration>
+					<!-- <append>true</append> -->
+					<excludes>
+						<exclude>**/${draft.package}/*</exclude>
+						<exclude>**/Draft/*</exclude>
+					</excludes>
+					<propertyName>surefire.arg.line</propertyName>
+				</configuration>
+
+				<executions>
+					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+						is passed as VM argument when Maven the Surefire plugin is executed. -->
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${jacoco.ut.execution.data.file}</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo 
+								runtime agent. -->
+							<!-- <propertyName>surefireArgLine</propertyName> -->
+						</configuration>
+					</execution>
+
+					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+						is passed as VM argument when Maven the Failsafe plugin is executed. -->
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${jacoco.it.execution.data.file}</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo 
+								runtime agent. -->
+						</configuration>
+					</execution>
+					<!-- Ensures that the code coverage report for integration tests after 
+						integration tests have been run. -->
+					<!-- <execution> <id>post-integration-test</id> <phase>post-integration-test</phase> 
+						<goals> <goal>report</goal> </goals> <configuration> Sets the path to the 
+						file which contains the execution data. <dataFile>${jacoco.it.execution.data.file}</dataFile> 
+						Sets the output directory for the code coverage report. <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory> 
+						</configuration> </execution> -->
+				</executions>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/sonar-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.7.0.1746</version>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${mvn.compiler.plugin}</version>
+				<configuration>
+					<excludes>
+						<exclude>**/${draft.package}/*.java</exclude>
+					</excludes>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${war.plugin.version}</version>
+				<configuration>
+					<packagingExcludes>WEB-INF/classes/core/draft/</packagingExcludes>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.tomcat.maven/tomcat7-maven-plugin -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<server>${tomcat-server}</server>
+					<url>${tomcat-url}</url>
+					<path>/rest</path>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>${ng.suite}</suiteXmlFile>
+					</suiteXmlFiles>
+
+					<testFailureIgnore>true</testFailureIgnore>
+					<argLine>
+						${surefire.arg.line}
+						-XX:+UseConcMarkSweepGC
+						-XX:+CMSClassUnloadingEnabled
+						-Xmx1024m
+						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+					</argLine>
+					<systemProperties>
+						<property>
+							<name>allure.results.directory</name>
+							<value>${project.build.directory}/allure-results</value>
+						</property>
+						<property>
+							<name>allure.link.issue.pattern</name>
+							<value>https://example.org/issue/{}</value>
+						</property>
+					</systemProperties>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjweaver</artifactId>
+						<version>${aspectj.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
+				<configuration>
+					<goal>report-only</goal>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>io.qameta.allure</groupId>
+				<artifactId>allure-maven</artifactId>
+				<version>${allure.maven.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<reportSets>
+					<reportSet>
+						<inherited>true</inherited>
+						<reports>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+				<configuration>
+					<dataFile>${jacoco.ut.execution.data.file}</dataFile>
+					<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</reporting>
+
+	<profiles>
+
+		<profile>
+			<id>tc_l</id>
+			<!-- <activation> <activeByDefault>true</activeByDefault> </activation> -->
+			<properties>
+				<tomcat-server>tc_l</tomcat-server>
+				<tomcat-url>http://localhost:7778/manager/text</tomcat-url>
+			</properties>
+		</profile>
+		<profile>
+			<id>tc_r</id>
+			<properties>
+				<tomcat-server>tc_r</tomcat-server>
+				<tomcat-url>http://nexus.wsgc.com:6062/manager/text</tomcat-url>
+			</properties>
+		</profile>
+		<profile>
+			<id>tc_entr</id>
+			<properties>
+				<tomcat-server>tc_entr</tomcat-server>
+				<tomcat-url>http://apprck-vicn001:8888/manager/text</tomcat-url>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>static-analysis</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+
+			<reporting>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jxr-plugin</artifactId>
+						<version>2.5</version>
+					</plugin>
+
+					<plugin>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs-maven-plugin</artifactId>
+						<version>${spotbugs.plugin.version}</version>
+						<configuration>
+							<includeTests>true</includeTests>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<!-- Static Analysis https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>${pmd.plugin.version}</version>
+						<configuration>
+							<linkXref>true</linkXref>
+							<sourceEncoding>utf-8</sourceEncoding>
+							<skipEmptyReport>false</skipEmptyReport>
+							<minimumTokens>100</minimumTokens>
+							<excludes>
+								<exclude>**/draft/**</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>${checkstyle.plugin.version}</version>
+						<reportSets>
+							<reportSet>
+								<reports>
+									<report>checkstyle</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+						<configuration>
+							<excludes>**/draft/**</excludes>
+						</configuration>
+					</plugin>
+
+				</plugins>
+
+			</reporting>
+
+		</profile>
+	</profiles>
+
+</project>
