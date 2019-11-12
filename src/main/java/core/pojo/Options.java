@@ -1,7 +1,5 @@
 package core.pojo;
 
-import core.pojo.Student;
-
 public enum Options {
 	
 	HC("GET", "Helth Check", "/rest", ""),
@@ -10,9 +8,7 @@ public enum Options {
 	GET_S("GET", "Get student by ID.", "/student/{id}", ""),
 	GET_AS("GET", "Get all students.", "/students", ""),
 	DEL_S("DELETE", "Delete student by ID.", "/student/{id}", ""),
-	UP_S("PUT", "Update student by ID. Body (XML/JSON)", "/student/{id}", new Student(1, "Chukhrai", "Yurii", 19, 1111111, 4.0f).toStringJson(true))
-	;
-	
+	UP_S("PUT", "Update student by ID. Body (XML/JSON)", "/student/{id}", new Student(1, "Chukhrai", "Yurii", 19, 1111111, 4.0f).toStringJson(true));
 	
 	String method;
 	String description;

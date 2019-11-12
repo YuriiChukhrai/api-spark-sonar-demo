@@ -3,12 +3,7 @@ package core.pojo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-//import org.codehaus.jackson.annotate.JsonProperty;
-
-import com.fasterxml.jackson.annotation.JsonRootName;
-
 @XmlRootElement(name = "student")
-@JsonRootName(value = "student")
 public final class Student extends Person {
 
 	private float gpa;

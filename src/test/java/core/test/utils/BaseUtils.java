@@ -1,4 +1,4 @@
-package com.wsi.ws.test.utils;
+package core.test.utils;
 
 import org.apache.log4j.Logger;
 

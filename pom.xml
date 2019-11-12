@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>core</groupId>
-	<artifactId>com.rest-api-demo.qa</artifactId>
+	<artifactId>com.rest-api-sonar-demo.qa</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -22,7 +22,6 @@
 
 		<aspectj.version>1.8.13</aspectj.version>
 		<ng.suite>testng/${tNG}.xml</ng.suite>
-		<!-- <testSourceDirectory>src/test/java/</testSourceDirectory> -->
 
 		<allure.testng.version>2.12.1</allure.testng.version>
 		<allure.maven.version>2.10.0</allure.maven.version>
@@ -30,9 +29,11 @@
 		<jacoco.version>0.8.4</jacoco.version>
 		<skip.integration.tests>true</skip.integration.tests>
 		<skip.unit.tests>true</skip.unit.tests>
-		<jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
-		<jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+
+		<jacoco.it.execution.data.file>${project.build.directory}/jacoco-it.exec</jacoco.it.execution.data.file>
+		<jacoco.ut.execution.data.file>${project.build.directory}/jacoco.exec</jacoco.ut.execution.data.file>
 		<draft.package>draft</draft.package>
+		<sonar.exclusions>**/${draft.package}/*,**/Draft/*,**/TestGroups.*,**/pojo/*</sonar.exclusions>
 	</properties>
 
 	<dependencies>
@@ -96,15 +97,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-xml</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
 			<version>2.8.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
 		</dependency>
 
 	</dependencies>
@@ -121,8 +128,7 @@
 				<configuration>
 					<!-- <append>true</append> -->
 					<excludes>
-						<exclude>**/${draft.package}/*</exclude>
-						<exclude>**/Draft/*</exclude>
+						<exclude>${sonar.exclusions}</exclude>
 					</excludes>
 					<propertyName>surefire.arg.line</propertyName>
 				</configuration>
@@ -143,29 +149,6 @@
 							<!-- <propertyName>surefireArgLine</propertyName> -->
 						</configuration>
 					</execution>
-
-					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
-						is passed as VM argument when Maven the Failsafe plugin is executed. -->
-					<execution>
-						<id>pre-integration-test</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${jacoco.it.execution.data.file}</destFile>
-							<!-- Sets the name of the property containing the settings for JaCoCo 
-								runtime agent. -->
-						</configuration>
-					</execution>
-					<!-- Ensures that the code coverage report for integration tests after 
-						integration tests have been run. -->
-					<!-- <execution> <id>post-integration-test</id> <phase>post-integration-test</phase> 
-						<goals> <goal>report</goal> </goals> <configuration> Sets the path to the 
-						file which contains the execution data. <dataFile>${jacoco.it.execution.data.file}</dataFile> 
-						Sets the output directory for the code coverage report. <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory> 
-						</configuration> </execution> -->
 				</executions>
 			</plugin>
 
@@ -174,6 +157,9 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
 				<version>3.7.0.1746</version>
+				<configuration>
+					<sonar.exclusions>${sonar.exclusions}</sonar.exclusions>
+				</configuration>
 			</plugin>
 
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
@@ -225,9 +211,7 @@
 					<testFailureIgnore>true</testFailureIgnore>
 					<argLine>
 						${surefire.arg.line}
-						-XX:+UseConcMarkSweepGC
-						-XX:+CMSClassUnloadingEnabled
-						-Xmx1024m
+						-Xmx2g
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
 					</argLine>
 					<systemProperties>
@@ -278,24 +262,8 @@
 				<groupId>io.qameta.allure</groupId>
 				<artifactId>allure-maven</artifactId>
 				<version>${allure.maven.version}</version>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco.version}</version>
-				<reportSets>
-					<reportSet>
-						<inherited>true</inherited>
-						<reports>
-							<!-- select non-aggregate reports -->
-							<report>report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
 				<configuration>
-					<dataFile>${jacoco.ut.execution.data.file}</dataFile>
-					<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+					<reportVersion>2.8.0</reportVersion>
 				</configuration>
 			</plugin>
 
@@ -305,25 +273,43 @@
 	<profiles>
 
 		<profile>
+			<id>jacoco-ut</id>
+
+			<reporting>
+				<plugins>
+
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<reportSets>
+							<reportSet>
+								<inherited>true</inherited>
+								<reports>
+									<!-- select non-aggregate reports -->
+									<report>report</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+						<configuration>
+							<dataFile>${jacoco.ut.execution.data.file}</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+							<excludes>
+								<exclude>${sonar.exclusions}</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</reporting>
+
+		</profile>
+
+		<profile>
 			<id>tc_l</id>
-			<!-- <activation> <activeByDefault>true</activeByDefault> </activation> -->
 			<properties>
 				<tomcat-server>tc_l</tomcat-server>
 				<tomcat-url>http://localhost:7778/manager/text</tomcat-url>
-			</properties>
-		</profile>
-		<profile>
-			<id>tc_r</id>
-			<properties>
-				<tomcat-server>tc_r</tomcat-server>
-				<tomcat-url>http://nexus.wsgc.com:6062/manager/text</tomcat-url>
-			</properties>
-		</profile>
-		<profile>
-			<id>tc_entr</id>
-			<properties>
-				<tomcat-server>tc_entr</tomcat-server>
-				<tomcat-url>http://apprck-vicn001:8888/manager/text</tomcat-url>
 			</properties>
 		</profile>
 
@@ -362,7 +348,7 @@
 							<skipEmptyReport>false</skipEmptyReport>
 							<minimumTokens>100</minimumTokens>
 							<excludes>
-								<exclude>**/draft/**</exclude>
+								<exclude>**/${draft.package}/**</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
@@ -380,15 +366,12 @@
 							</reportSet>
 						</reportSets>
 						<configuration>
-							<excludes>**/draft/**</excludes>
+							<excludes>**/${draft.package}/**</excludes>
 						</configuration>
 					</plugin>
 
 				</plugins>
-
 			</reporting>
-
 		</profile>
 	</profiles>
-
 </project>

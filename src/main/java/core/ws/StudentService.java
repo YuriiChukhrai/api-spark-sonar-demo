@@ -2,6 +2,7 @@ package core.ws;
 
 import java.util.*;
 //import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import core.pojo.Student;
 
@@ -18,9 +19,16 @@ public class StudentService {
 
 	// ***************************** CRUD *****************************
 
-	public Student add(Student student) {
-		
-		return students.put(String.valueOf(student.getId()), student);
+	public boolean add(Student student) {
+
+		if (student.getId() < 0) {
+			student.setId(students.size() + 1);
+			return students.put(String.valueOf(student.getId()), student) == null;
+		}
+
+		else {
+			return students.put(String.valueOf(student.getId()), student) == null;
+		}
 	}
 
 	public Student update(String id, Student studentNew) {
@@ -36,8 +44,16 @@ public class StudentService {
 		students.remove(id);
 	}
 
+	public void deleteAll() {
+		students.clear();
+	}
+	
 	public List<Student> findAll() {
 		return new ArrayList<>(students.values());
+	}
+	
+	public Stream<Student> getAll() {
+		return students.values().stream();
 	}
 
 	public int size() {

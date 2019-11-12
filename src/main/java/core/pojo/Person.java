@@ -12,7 +12,7 @@ public abstract class Person {
 	protected String fname;
 	protected int age;
 	protected int ssn;
-	protected int id;
+	protected int id = -1;
 	
 	@XmlElement(name = "lname")
 	public final String getLname() {
