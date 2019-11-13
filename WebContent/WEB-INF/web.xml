@@ -15,7 +15,7 @@
 		<filter-class>spark.servlet.SparkFilter</filter-class>
 		<init-param>
 			<param-name>applicationClass</param-name>
-			<param-value>core.ws.WebService</param-value>
+			<param-value>core.qa.demo.ws.WebService</param-value>
 		</init-param>
 	</filter>
 

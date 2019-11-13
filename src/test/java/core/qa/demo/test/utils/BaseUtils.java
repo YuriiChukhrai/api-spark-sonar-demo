@@ -1,4 +1,4 @@
-package core.test.utils;
+package core.qa.demo.test.utils;
 
 import org.apache.log4j.Logger;
 

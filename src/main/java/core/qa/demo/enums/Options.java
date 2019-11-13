@@ -1,4 +1,6 @@
-package core.pojo;
+package core.qa.demo.enums;
+
+import core.qa.demo.pojo.Student;
 
 public enum Options {
 	

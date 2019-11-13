@@ -1,4 +1,4 @@
-package core.pojo;
+package core.qa.demo.pojo;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -6,12 +6,12 @@
 
 	<test name="JSON / XML">
 		<classes>
-			<class name="core.test.unit.RestAssureTestJson">
+			<class name="core.qa.demo.test.unit.RestAssureTestJson">
 				<methods>
 					<include name="test01" />
 				</methods>
 			</class>
-			<class name="core.test.unit.RestAssureTestXml">
+			<class name="core.qa.demo.test.unit.RestAssureTestXml">
 				<methods>
 					<include name="test01" />
 				</methods>

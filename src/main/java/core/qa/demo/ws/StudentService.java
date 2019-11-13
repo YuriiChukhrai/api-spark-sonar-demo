@@ -1,10 +1,10 @@
-package core.ws;
+package core.qa.demo.ws;
 
 import java.util.*;
 //import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import core.pojo.Student;
+import core.qa.demo.pojo.Student;
 
 public class StudentService {
 

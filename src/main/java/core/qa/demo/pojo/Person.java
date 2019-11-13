@@ -1,6 +1,6 @@
-package core.pojo;
+package core.qa.demo.pojo;
 
-import static core.util.BaseUtils.objToStringXml;
+import static core.qa.demo.util.BaseUtils.objToStringXml;
 
 import javax.xml.bind.annotation.XmlElement;
 

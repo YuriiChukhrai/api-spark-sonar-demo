@@ -1,13 +1,14 @@
-package core.test.unit;
+package core.qa.demo.test.unit;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import core.pojo.Student;
-import core.pojo.Students;
-import core.test.utils.BaseUtils;
-import core.util.TestGroups;
+import com.google.common.net.HttpHeaders;
 
+import core.qa.demo.pojo.Student;
+import core.qa.demo.pojo.Students;
+import core.qa.demo.test.utils.BaseUtils;
+import core.qa.demo.util.TestGroups;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -18,6 +19,7 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import io.qameta.allure.TmsLink;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -32,12 +34,11 @@ import java.util.Map;
 
 public class RestAssureTestJson extends BaseTest {
 
-	private final String contentTypeJson = ContentType.JSON.getContentTypeStrings()[0];
 	private Map<String, String> HEADERS = Collections.unmodifiableMap(new HashMap<String, String>() {
 		private static final long serialVersionUID = 1L;
 		{
-			put("Content-Type", contentTypeJson);
-			put("Accept", contentTypeJson);
+			put(HttpHeaders.CONTENT_TYPE, contentTypeJson);
+			put(HttpHeaders.ACCEPT, contentTypeJson);
 		}
 	});
 
@@ -64,6 +65,7 @@ public class RestAssureTestJson extends BaseTest {
 					.relaxedHTTPSValidation()
 					.log()
 					.all(true)
+					.filter(new AllureRestAssured())
 					.port(PORT)
 					.request()
 					.headers(HEADERS)
@@ -102,6 +104,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -149,6 +152,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -187,6 +191,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -228,6 +233,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -265,6 +271,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -302,6 +309,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -354,6 +362,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -391,6 +400,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)
@@ -432,6 +442,7 @@ public class RestAssureTestJson extends BaseTest {
 					.relaxedHTTPSValidation()
 					.log()
 					.all(true)
+					.filter(new AllureRestAssured())
 					.port(PORT)
 					.request()
 					.headers(HEADERS)
@@ -455,6 +466,7 @@ public class RestAssureTestJson extends BaseTest {
 				.relaxedHTTPSValidation()
 				.log()
 				.all(true)
+				.filter(new AllureRestAssured())
 				.port(PORT)
 				.request()
 				.headers(HEADERS)

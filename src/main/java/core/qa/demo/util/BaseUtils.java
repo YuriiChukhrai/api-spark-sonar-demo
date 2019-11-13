@@ -1,4 +1,4 @@
-package core.util;
+package core.qa.demo.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,6 +17,10 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class BaseUtils {
+	
+	private BaseUtils() {
+		throw new UnsupportedOperationException("Illegal access to private constructor");
+	}
 
 	private static final Logger LOG = Logger.getLogger(BaseUtils.class.getName());
 

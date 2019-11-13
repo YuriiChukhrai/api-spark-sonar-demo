@@ -1,4 +1,4 @@
-package core.util;
+package core.qa.demo.util;
 
 final public class TestGroups {
 		

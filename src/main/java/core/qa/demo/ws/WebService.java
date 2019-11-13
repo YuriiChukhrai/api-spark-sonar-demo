@@ -1,4 +1,4 @@
-package core.ws;
+package core.qa.demo.ws;
 
 import spark.Spark;
 import spark.servlet.SparkApplication;
@@ -7,10 +7,12 @@ import java.util.List;
 
 import com.google.gson.GsonBuilder;
 
-import core.pojo.Options;
-import core.pojo.Student;
-import core.pojo.Students;
-import core.util.BaseUtils;
+import core.qa.demo.enums.ContentType;
+import core.qa.demo.enums.HttpHeaders;
+import core.qa.demo.enums.Options;
+import core.qa.demo.pojo.Student;
+import core.qa.demo.pojo.Students;
+import core.qa.demo.util.BaseUtils;
 
 public class WebService implements SparkApplication {
 
@@ -18,8 +20,10 @@ public class WebService implements SparkApplication {
 	@Override
 	public void init() {
 
+		final String author = "2019. McKesson. QA. Yurii Chukhrai - yurii.chukhrai@mckesson.com";
+
 		// Main Page, Info
-		Spark.get("/", (request, response) -> "Yurii Chukhrai - [Student] WebService V1 - For RestAssure.");
+		Spark.get("/", (request, response) -> author + " - [Student] WebService V1 - For RestAssure.");
 		Spark.options("/opt", (request, response) -> {
 
 			final StringBuilder sb = new StringBuilder("<!doctype html><html lang=\"en\"><body>");
@@ -30,9 +34,9 @@ public class WebService implements SparkApplication {
 			}
 
 			sb.append("</body></html>");
-
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
 			response.status(200);
-			response.type("text/html");
+			response.type(ContentType.HTML.getMime());
 
 			return sb.toString();
 		});
@@ -42,14 +46,15 @@ public class WebService implements SparkApplication {
 
 			String msg = "N/A";
 			StudentService studentService = new StudentService();
-			response.type("text/html");
+			response.type(ContentType.HTML.getMime());
 			boolean isAdded = false;
 			Student student;
-			
-			if (request.contentType().toLowerCase().contains("application/json")) {
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+
+			if (request.contentType().toLowerCase().contains(ContentType.JSON.getMime())) {
 				student = new GsonBuilder().create().fromJson(request.body(), Student.class);
 				isAdded = studentService.add(student);
-			} else if (request.contentType().toLowerCase().contains("application/xml")) {
+			} else if (request.contentType().toLowerCase().contains(ContentType.XML.getMime())) {
 				student = BaseUtils.stringXmlToObj(request.body(), Student.class);
 				isAdded = studentService.add(student);
 			} else {
@@ -75,17 +80,19 @@ public class WebService implements SparkApplication {
 			String msg = String.format("User ID [%s] not found.", request.params(":id"));
 			StudentService studentService = new StudentService();
 			Student student = studentService.findById(request.params(":id"));
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
 
 			if (student != null) {
 
-				if (request.headers("Accept").toLowerCase().contains("application/json")) {
-					//response.header("Content-Type", "application/json");
-					response.type("application/json");
-					
+				if (request.headers(HttpHeaders.ACCEPT.getHeader()).toLowerCase()
+						.contains(ContentType.JSON.getMime())) {
+
+					response.type(ContentType.JSON.getMime());
+
 					return student.toStringJson(false);
-				} else if (request.headers("Accept").toLowerCase().contains("application/xml")) {
-					//response.header("Content-Type", "application/xml");
-					response.type("application/xml");
+				} else if (request.headers(HttpHeaders.ACCEPT.getHeader()).toLowerCase()
+						.contains(ContentType.XML.getMime())) {
+					response.type(ContentType.XML.getMime());
 
 					return student.toString(false);
 				}
@@ -101,23 +108,25 @@ public class WebService implements SparkApplication {
 
 			StudentService studentService = new StudentService();
 			List<Student> result = studentService.findAll();
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
 
 			if (result.isEmpty()) {
 				response.status(404);
-				response.type("text/html");
-				//return objectMapper.writeValueAsString);
+				response.type(ContentType.HTML.getMime());
 				return "Users were not found";
 			} else {
 
-				if (request.headers("Accept").toLowerCase().contains("application/json")) {
+				if (request.headers(HttpHeaders.ACCEPT.getHeader()).toLowerCase()
+						.contains(ContentType.JSON.getMime())) {
 					response.status(200);
-					response.type("application/json");
+					response.type(ContentType.JSON.getMime());
 
 					return new Students().setStudents(result).toStringJson(false);
-					
-				} else if (request.headers("Accept").toLowerCase().contains("application/xml")) {
+
+				} else if (request.headers(HttpHeaders.ACCEPT.getHeader()).toLowerCase()
+						.contains(ContentType.XML.getMime())) {
 					response.status(200);
-					response.type("application/xml");
+					response.type(ContentType.XML.getMime());
 
 					return new Students().setStudents(result).toString();
 				}
@@ -133,12 +142,13 @@ public class WebService implements SparkApplication {
 
 			StudentService studentService = new StudentService();
 			String msg = "Empty input";
-			response.type("text/html");
-			
+			response.type(ContentType.HTML.getMime());
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+
 			if (request != null && request.body() != null && !request.body().isEmpty()) {
 
 				String id = request.params(":id");
-				if (request.contentType().toLowerCase().contains("application/json")) {
+				if (request.contentType().toLowerCase().contains(ContentType.JSON.getMime())) {
 
 					Student studentOld = studentService.findById(id);
 
@@ -156,7 +166,7 @@ public class WebService implements SparkApplication {
 
 						return String.format("User with ID [%s] was created.", id);
 					}
-				} else if (request.contentType().toLowerCase().contains("application/xml")) {
+				} else if (request.contentType().toLowerCase().contains(ContentType.XML.getMime())) {
 
 					Student studentOld = studentService.findById(id);
 
@@ -189,10 +199,11 @@ public class WebService implements SparkApplication {
 		Spark.delete("student/:id", (request, response) -> {
 
 			StudentService studentService = new StudentService();
-			response.type("text/html");
+			response.type(ContentType.HTML.getMime());
 			String id = request.params(":id");
-
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
 			Student student = studentService.findById(id);
+
 			if (student != null) {
 				studentService.delete(id);
 				return String.format("User with ID [%s] was deleted. Size [%d].", id, studentService.size());
@@ -201,21 +212,20 @@ public class WebService implements SparkApplication {
 				return String.format("User with ID [%s] was not found.", id);
 			}
 		});
-		
+
 		/* DELETE - delete user */
 		Spark.delete("students", (request, response) -> {
 
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
 			StudentService studentService = new StudentService();
-			response.type("text/html");
-			String id = request.params(":id");
+			response.type(ContentType.HTML.getMime());
 
-			
-			if(studentService.size() > 0) {
+			if (studentService.size() > 0) {
 				studentService.deleteAll();
 				response.status(200);
-				return String.format("All users were deleted. Size [%d].", id, studentService.size());
-			}
-			else {
+
+				return String.format("All users were deleted. Size [%d].", studentService.size());
+			} else {
 				response.status(400);
 				return "Collection is already empty.";
 			}

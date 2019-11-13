@@ -1,6 +1,6 @@
-package core.pojo;
+package core.qa.demo.pojo;
 
-import static core.util.BaseUtils.objToStringXml;
+import static core.qa.demo.util.BaseUtils.objToStringXml;
 
 import java.util.List;
 
@@ -8,7 +8,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.gson.GsonBuilder;
-import core.util.BaseUtils;
+
+import core.qa.demo.util.BaseUtils;
 
 @XmlRootElement(name = "students")
 public class Students {
