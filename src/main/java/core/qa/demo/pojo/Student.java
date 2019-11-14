@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "student")
-public final class Student extends Person {
+public final class Student extends Person implements Comparable <Student> {
 
 	private float gpa;
 
@@ -30,4 +30,12 @@ public final class Student extends Person {
 	public float getGpa() {
 		return gpa;
 	}
+
+	@Override
+	public int compareTo(Student student) {
+		
+		return this.id - student.id;
+	}
+	
+	
 }

@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>core.qa.demo</groupId>
-	<artifactId>rest-api-spark-sonar</artifactId>
+	<artifactId>api-spark-sonar</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>Rest api spark sonar demo</name>
+	<name>Api spark sonar demo</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -29,7 +29,7 @@
 		<allure.testng.version>2.13.0</allure.testng.version>
 		<allure.maven.version>2.10.0</allure.maven.version>
 
-		<jacoco.version>0.8.4</jacoco.version>
+		<jacoco.version>0.8.5</jacoco.version>
 		<skip.integration.tests>true</skip.integration.tests>
 		<skip.unit.tests>true</skip.unit.tests>
 
@@ -39,16 +39,6 @@
 	</properties>
 
 	<dependencies>
-
-		<!-- <dependency> <groupId>org.ow2.asm</groupId> <artifactId>asm</artifactId> 
-			<version>7.2</version> </dependency> -->
-
-<!-- 		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>3.3.1</version>
-			<scope>test</scope>
-		</dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
 		<dependency>
@@ -94,8 +84,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- ********************************************* -->
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -134,83 +122,6 @@
 		<plugins>
 
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco.version}</version>
-
-				<configuration>
-					<excludes>
-						<exclude>${sonar.exclusions}</exclude>
-					</excludes>
-					<propertyName>surefire.arg.line</propertyName>
-				</configuration>
-
-				<executions>
-					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
-						is passed as VM argument when Maven the Surefire plugin is executed. -->
-					<execution>
-						<id>pre-unit-test</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${jacoco.ut.execution.data.file}</destFile>
-							<!-- Sets the name of the property containing the settings for JaCoCo 
-								runtime agent. <propertyName>surefireArgLine</propertyName> -->
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/sonar-maven-plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.7.0.1746</version>
-				<configuration>
-					<sonar.exclusions>${sonar.exclusions}</sonar.exclusions>
-				</configuration>
-			</plugin>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${mvn.compiler.plugin}</version>
-				<configuration>
-					<excludes>
-						<exclude>**/${draft.package}/*.java</exclude>
-					</excludes>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-				</configuration>
-			</plugin>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>${war.plugin.version}</version>
-				<configuration>
-					<packagingExcludes>WEB-INF/classes/core/draft/</packagingExcludes>
-					<warSourceDirectory>WebContent</warSourceDirectory>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.tomcat.maven/tomcat7-maven-plugin -->
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<server>${tomcat-server}</server>
-					<url>${tomcat-url}</url>
-					<path>/rest</path>
-
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven.surefire.plugin.version}</version>
@@ -218,11 +129,8 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>${ng.suite}</suiteXmlFile>
 					</suiteXmlFiles>
-
 					<testFailureIgnore>true</testFailureIgnore>
 					<argLine>
-						${surefire.arg.line}
-						-Xmx512m
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
 					</argLine>
 					<systemProperties>
@@ -247,6 +155,50 @@
 						<version>${aspectj.version}</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/sonar-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.7.0.1746</version>
+				<configuration>
+					<sonar.exclusions>${sonar.exclusions}</sonar.exclusions>
+				</configuration>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${mvn.compiler.plugin}</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-war-plugin -->
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${war.plugin.version}</version>
+				<configuration>
+					<packagingExcludes>WEB-INF/classes/core/draft/</packagingExcludes>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.tomcat.maven/tomcat7-maven-plugin -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<server>${tomcat-server}</server>
+					<url>${tomcat-url}</url>
+					<path>/v1</path>
+
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -289,6 +241,52 @@
 
 		<profile>
 			<id>jacoco-ut</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+
+						<configuration>
+							<excludes>
+								<exclude>${sonar.exclusions}</exclude>
+							</excludes>
+							<propertyName>surefire.arg.line</propertyName>
+						</configuration>
+
+						<executions>
+							<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+								is passed as VM argument when Maven the Surefire plugin is executed. -->
+							<execution>
+								<id>pre-unit-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<destFile>${jacoco.ut.execution.data.file}</destFile>
+									<!-- Sets the name of the property containing the settings for JaCoCo 
+										runtime agent. <propertyName>surefireArgLine</propertyName> -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven.surefire.plugin.version}</version>
+						<configuration>
+							<argLine>
+								${surefire.arg.line}
+								-Xmx1g
+								-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+							</argLine>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 
 			<reporting>
 				<plugins>

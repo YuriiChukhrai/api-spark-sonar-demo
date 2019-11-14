@@ -16,32 +16,37 @@ import core.qa.demo.util.BaseUtils;
 
 public class WebService implements SparkApplication {
 
+	static final String AUTHOR = "2019. McKesson. QA. Yurii Chukhrai";
+	static final StringBuilder sb = new StringBuilder();
+
 	/* Execute server - CRUD - Create - Read - Update - Delete */
 	@Override
 	public void init() {
 
-		final String author = "2019. McKesson. QA. Yurii Chukhrai - yurii.chukhrai@mckesson.com";
+		/* Main Page, Info, Health check. [ {host}:{port}/v1/ ] */
+		Spark.get("/", (request, response) -> String.format("%s - [Student] WebService project.", AUTHOR));
 
-		// Main Page, Info
-		Spark.get("/", (request, response) -> author + " - [Student] WebService V1 - For RestAssure.");
+		/* OPTIONS. Info about all available methods */
 		Spark.options("/opt", (request, response) -> {
 
-			final StringBuilder sb = new StringBuilder("<!doctype html><html lang=\"en\"><body>");
+			if (sb.length() <= 0) {
+				sb.append("<!doctype html><html lang=\"en\"><body>");
 
-			for (Options option : Options.values()) {
-				sb.append(String.format("<p>Method [%s], Descriptions [%s], Path [%s]. <p>Body [%s].</p></p>",
-						option.getMethod(), option.getDescription(), option.getPath(), option.getBody()));
+				for (Options option : Options.values()) {
+					sb.append(String.format("<p>Method [%s], Descriptions [%s], Path [%s]. <p>Body [%s].</p></p>",
+							option.getMethod(), option.getDescription(), option.getPath(), option.getBody()));
+				}
+				sb.append("</body></html>");
 			}
 
-			sb.append("</body></html>");
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 			response.status(200);
 			response.type(ContentType.HTML.getMime());
 
 			return sb.toString();
 		});
 
-		/* JSON-XML - POST - Add an student */
+		/* JSON-XML - POST - Add a Student. [ {host}:{port}/v1/student/add + BODY ] */
 		Spark.post("student/add", (request, response) -> {
 
 			String msg = "N/A";
@@ -49,17 +54,20 @@ public class WebService implements SparkApplication {
 			response.type(ContentType.HTML.getMime());
 			boolean isAdded = false;
 			Student student;
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 
 			if (request.contentType().toLowerCase().contains(ContentType.JSON.getMime())) {
 				student = new GsonBuilder().create().fromJson(request.body(), Student.class);
 				isAdded = studentService.add(student);
+
 			} else if (request.contentType().toLowerCase().contains(ContentType.XML.getMime())) {
 				student = BaseUtils.stringXmlToObj(request.body(), Student.class);
 				isAdded = studentService.add(student);
+
 			} else {
 				msg = String.format("Unknown Content-Type [%s].", request.contentType());
 				response.status(406);
+
 				return msg;
 			}
 
@@ -74,13 +82,13 @@ public class WebService implements SparkApplication {
 			return msg;
 		});
 
-		/* GET - Give me user with this id */
+		/* GET - Give me user with this id. [ {host}:{port}/v1/student/{id} ] */
 		Spark.get("student/:id", (request, response) -> {
 
 			String msg = String.format("User ID [%s] not found.", request.params(":id"));
 			StudentService studentService = new StudentService();
 			Student student = studentService.findById(request.params(":id"));
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 
 			if (student != null) {
 
@@ -103,12 +111,12 @@ public class WebService implements SparkApplication {
 			return msg;
 		});
 
-		/* GET - Give me all users */
+		/* GET - Give me all users. [ {host}:{port}/v1/students ] */
 		Spark.get("students", (request, response) -> {
 
 			StudentService studentService = new StudentService();
 			List<Student> result = studentService.findAll();
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 
 			if (result.isEmpty()) {
 				response.status(404);
@@ -137,13 +145,13 @@ public class WebService implements SparkApplication {
 			}
 		});
 
-		/* PUT - Update user */
+		/* PUT - Update user. [ {host}:{port}/v1/student/{id} ] */
 		Spark.put("student/:id", (request, response) -> {
 
 			StudentService studentService = new StudentService();
 			String msg = "Empty input";
 			response.type(ContentType.HTML.getMime());
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 
 			if (request != null && request.body() != null && !request.body().isEmpty()) {
 
@@ -195,13 +203,13 @@ public class WebService implements SparkApplication {
 			return msg;
 		});
 
-		/* DELETE - delete user */
+		/* DELETE - delete user. [ {host}:{port}/v1/student/{id} ] */
 		Spark.delete("student/:id", (request, response) -> {
 
 			StudentService studentService = new StudentService();
 			response.type(ContentType.HTML.getMime());
 			String id = request.params(":id");
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 			Student student = studentService.findById(id);
 
 			if (student != null) {
@@ -213,10 +221,10 @@ public class WebService implements SparkApplication {
 			}
 		});
 
-		/* DELETE - delete user */
+		/* DELETE - delete all users. [ {host}:{port}/v1/students ] */
 		Spark.delete("students", (request, response) -> {
 
-			response.header(HttpHeaders.X_POWERED_BY.getHeader(), author);
+			response.header(HttpHeaders.X_POWERED_BY.getHeader(), AUTHOR);
 			StudentService studentService = new StudentService();
 			response.type(ContentType.HTML.getMime());
 
